@@ -63,11 +63,13 @@ function drawFourier() {
     window.requestAnimationFrame(drawFourier);
 }
 
-const l = 1.5
+let l = 1
 const startPoint = [0, 0]
 
 function drawMandelBrot() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.beginPath();
+    ctx.clearRect(0, 0, width, height);
     const mandelBrot = (x0, y0, xk, yk, maxIter) => {
         const [x,y] = [x0*x0 - y0*y0 + xk, 2*x0*y0 + yk]
         if (maxIter == 0 || x0**2+y0**2>2) return maxIter;
@@ -77,13 +79,40 @@ function drawMandelBrot() {
         for(let j=0; j<width; j++) {
             const x = startPoint[0] + 2*l*(i-width/2)/width;
             const y = startPoint[1] + 2*l*(j-height/2)/height;
-            const k = mandelBrot(0, 0, x, y, 50)
+            const k = mandelBrot(0, 0, x, y, 100)
             if (k==0) continue;
-            const [r, g, b, a] = [255,k,0,255]
+            const [r, g, b, a] = [0,k,255,255]
             ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
             ctx.fillRect( i, j, 1, 1 );
         }            
     }
 }
 
+document.addEventListener('keydown', (event) => {
+    switch(event.key) {
+        case 'w':
+            startPoint[1] -= l/10
+            break;
+        case 'a':
+            startPoint[0] -= l/10
+            break;
+        case 's':
+            startPoint[1] += l/10
+            break;
+        case 'd':
+            startPoint[0] += l/10
+            break;
+        case '+':
+            l /= 1.1
+            break;
+        case '-':
+            l *= 1.1
+            break;
+    }
+    window.requestAnimationFrame(drawMandelBrot);
+})
+
+// canvas.style.width = "0px"
+// canvas.style.height = "500px"
 window.requestAnimationFrame(drawMandelBrot);
+ctx.restore()
